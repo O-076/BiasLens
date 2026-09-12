@@ -24,10 +24,11 @@ function cleanJson(str: string): string {
 
 async function getAvailableModels(apiKey: string): Promise<string[]> {
   const priority = [
+    'gemini-3.6-flash',
+    'gemini-2.5-flash',
     'gemini-2.0-flash',
     'gemini-1.5-flash-latest',
     'gemini-1.5-flash',
-    'gemini-2.5-flash',
     'gemini-2.0-flash-exp',
     'gemini-1.5-flash-002',
     'gemini-1.5-flash-001',
@@ -40,13 +41,17 @@ async function getAvailableModels(apiKey: string): Promise<string[]> {
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data.models)) {
-        const available = data.models
+        const available: string[] = data.models
           .filter((m: any) => m.supportedGenerationMethods?.includes('generateContent'))
           .map((m: any) => m.name.replace(/^models\//, ''));
         
-        const matched = priority.filter(p => available.includes(p));
-        if (matched.length > 0) return matched;
-        if (available.length > 0) return available;
+        // Prioritize any flash models from the API response in descending order (newest first)
+        const flashModels = available
+          .filter((m: string) => m.includes('flash'))
+          .sort((a, b) => b.localeCompare(a));
+        
+        const combined = Array.from(new Set([...flashModels, ...priority, ...available]));
+        if (combined.length > 0) return combined;
       }
     }
   } catch (e) {
@@ -81,8 +86,13 @@ export async function analyzeText(arg1: string, arg2: string): Promise<AnalysisR
   const prompt = buildAnalysisPrompt(textToAnalyze);
 
   let lastError: any = null;
+  const attempted = new Set<string>();
 
-  for (const modelName of modelsToTry) {
+  while (modelsToTry.length > 0) {
+    const modelName = modelsToTry.shift()!;
+    if (attempted.has(modelName)) continue;
+    attempted.add(modelName);
+
     try {
       const model = genAI.getGenerativeModel({
         model: modelName,
@@ -112,11 +122,19 @@ export async function analyzeText(arg1: string, arg2: string): Promise<AnalysisR
     } catch (error: any) {
       console.warn(`Attempt with model "${modelName}" failed:`, error.message);
       lastError = error;
-      // If error is 404 model not found, loop to next candidate
-      if (error.message?.includes('404') || error.message?.includes('not found')) {
+
+      // If Google suggests a specific model in the error message, queue it to try next!
+      const suggestionMatch = error.message?.match(/use models\/([a-zA-Z0-9.-]+)/i);
+      if (suggestionMatch && suggestionMatch[1] && !attempted.has(suggestionMatch[1])) {
+        modelsToTry.unshift(suggestionMatch[1]);
+      }
+
+      // If error is 404 or deprecated model, continue trying other candidates
+      if (error.message?.includes('404') || error.message?.includes('not found') || error.message?.includes('no longer available')) {
         continue;
       }
-      // If error is quota or invalid key, throw immediately
+
+      // If error is quota or invalid key, stop and throw immediately
       if (error.message?.includes('API_KEY_INVALID') || error.message?.includes('quota')) {
         throw error;
       }
