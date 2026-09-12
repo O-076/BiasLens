@@ -13,13 +13,65 @@
 
 ---
 
+## ⚡ Quick Setup: Run in 2 Minutes
+
+Get BiasLens running in your browser in under two minutes:
+
+### 1. Clone & Build
+```bash
+git clone https://github.com/O-076/BiasLens.git
+cd BiasLens
+npm install
+npm run build
+```
+*(This compiles the extension into `.output/chrome-mv3/` using Vite & WXT)*.
+
+### 2. Load into Chrome
+1. Open Google Chrome (or Brave, Edge, Arc) and navigate to `chrome://extensions/`.
+2. Turn on **Developer mode** using the toggle switch in the top-right corner.
+3. Click **Load unpacked** in the top-left corner.
+4. Select the `.output/chrome-mv3` folder inside the `BiasLens` directory.
+5. Click the **Puzzle icon 🧩** in your Chrome toolbar and **Pin 📌 BiasLens** for easy access.
+
+### 3. Connect Free Gemini API Key
+1. Click the **BiasLens** icon in your toolbar to open the side panel.
+2. Click the **Gear icon (⚙️)** in the top-right corner to open **Preferences & Credentials**.
+3. Paste your Gemini API key (generate one free in 30 seconds at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)).
+4. Click **Save Key** — the badge will switch to **Ready**.
+
+---
+
+## 📖 How to Use BiasLens
+
+### 1. Active Webpage Analysis
+1. Navigate to any news article, editorial, blog, or Wikipedia entry (e.g. on Wikipedia, BBC, Substack, CNN).
+2. Open the **BiasLens Side Panel** from your toolbar.
+3. Select **Active Tab** and click **Analyze Active Tab**.
+4. Biases are highlighted directly on the live webpage with interactive hover cards, and the side panel renders the calibrated Neutrality Index, summary, and category radar chart.
+
+### 2. Manual Text / Paste Mode
+1. In the side panel, switch to **Manual Text**.
+2. Paste any speech, social media post, press release, or document.
+3. *Tip:* Try one of the built-in sample pills (**News Article**, **Opinion Editorial**, or **Social Media Post**).
+4. Click **Analyze Text** to inspect the instant rhetorical audit.
+
+### 3. Right-Click Context Menu
+1. Highlight any sentence or paragraph on any page.
+2. Right-click and choose **"Analyze with BiasLens"**.
+3. The side panel opens automatically with the targeted audit.
+
+### 4. Reviewing Targeted Neutral Rewrites
+Scroll down to the **Targeted Neutral Revisions** drawer:
+- **Sentence by Sentence**: Inspect each biased sentence alongside its neutral replacement and a word-by-word diff of added/removed vocabulary.
+- **In-Context Passage**: View the full document with *only* the biased sentences surgically replaced, preserving all surrounding objective prose 100% verbatim.
+
+---
+
 ## 📑 Table of Contents
 
 - [The Problem & Solution](#-the-problem--solution)
 - [Key Innovations & Features](#-key-innovations--features)
 - [The 13-Type Bias Taxonomy](#-the-13-type-bias-taxonomy)
-- [How to Install & Set Up](#-how-to-install--set-up)
-- [User Guide (How to Use BiasLens)](#-user-guide-how-to-use-biaslens)
 - [Technical Architecture](#-technical-architecture)
 - [Design Philosophy: Impeccable Craft](#-design-philosophy-impeccable-craft)
 - [Troubleshooting & FAQ](#-troubleshooting--faq)
@@ -96,71 +148,6 @@ BiasLens identifies and categorizes 13 distinct cognitive biases and rhetorical 
 | **Cherry Picking** | `#eab308` (Yellow) | Suppressing contradictory facts while highlighting only data points that support a preconceived agenda. | *"Citing only the single profitable quarter while ignoring five consecutive years of net losses."* |
 | **False Causation** | `#ec4899` (Pink) | Conflating correlation with direct causation (*post hoc ergo propter hoc*). | *"Crime rates dropped after the billboard was installed, demonstrating its deterrent power."* |
 | **Whataboutism** | `#8b5cf6` (Violet) | Deflecting legitimate critique by counter-accusing an unrelated party of equal or worse conduct. | *"Why investigate this municipal budget shortfall when neighboring cities have larger deficits?"* |
-
----
-
-## 🛠️ How to Install & Set Up
-
-### Prerequisites
-- Google Chrome (or any Chromium browser: Brave, Edge, Arc).
-- [Node.js](https://nodejs.org/) (v18 or newer) and `npm`.
-- A free **Google Gemini API Key** (takes 30 seconds at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)).
-
-### 1. Clone & Install Dependencies
-```bash
-git clone https://github.com/O-076/BiasLens.git
-cd BiasLens
-npm install
-```
-
-### 2. Build the Extension
-```bash
-npm run build
-```
-This bundles the production extension into `.output/chrome-mv3/` using Vite and WXT.
-
-### 3. Load the Extension in Chrome
-1. In Chrome, open `chrome://extensions/`.
-2. Toggle **Developer mode** on (top-right corner).
-3. Click **Load unpacked** (top-left button).
-4. Select the `.output/chrome-mv3` directory inside the `BiasLens` folder.
-5. Click the **Puzzle piece icon** in your Chrome toolbar and **Pin 📌 BiasLens** for easy access.
-
-### 4. Enter Your Gemini API Key
-1. Click the **BiasLens** icon to open the side panel.
-2. Click the **Gear icon (⚙️)** in the top right to open **Preferences & Credentials**.
-3. Paste your Gemini API key (`AIzaSy...`) into the key field.
-4. Click **Save Key**. The status indicator will switch to **Ready**.
-
----
-
-## 📖 User Guide (How to Use BiasLens)
-
-### Mode 1: Active Webpage Analysis
-1. Navigate to any news article, editorial, blog post, or Wikipedia page.
-2. Open the **BiasLens Side Panel** by clicking the toolbar icon.
-3. Verify the switcher is on **Active Tab** and click **Analyze Active Tab**.
-4. Within seconds:
-   - Biases will be highlighted directly on the live webpage.
-   - The side panel will display the calibrated Neutrality Index, summary, and category radar chart.
-   - Scroll down in the webpage to see tooltips on highlighted sentences.
-
-### Mode 2: Manual Text / Paste Mode
-1. In the side panel, toggle the mode switcher to **Manual Text**.
-2. Paste any statement, email draft, political speech, or press release into the text box.
-3. *Tip:* Try one of the built-in sample pills (**News Article**, **Opinion Editorial**, or **Social Media Post**).
-4. Click **Analyze Text** to inspect the detailed rhetorical audit.
-
-### Mode 3: Right-Click Context Menu
-1. Highlight any sentence or paragraph on any webpage.
-2. Right-click the selected text.
-3. Select **"Analyze with BiasLens"**.
-4. The side panel will open automatically with the targeted analysis.
-
-### Mode 4: Reviewing Targeted Neutral Rewrites
-Scroll to the **Targeted Neutral Revisions** section at the bottom of the audit report:
-- **Sentence by Sentence**: Inspect each biased sentence, see its direct neutral replacement, and view the word-by-word diff of added/removed vocabulary.
-- **In-Context Passage**: Read the entire passage with only the biased sentences replaced. Click **Copy Corrected Text** to export the sanitized text to your clipboard.
 
 ---
 
