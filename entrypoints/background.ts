@@ -54,13 +54,40 @@ export default defineBackground(() => {
 
   async function handlePageAnalysis(tabId: number) {
     try {
+      // Check active tab URL first
+      const tab = await browser.tabs.get(tabId);
+      const url = tab.url || '';
+
+      if (!url || url.startsWith('chrome://') || url.startsWith('edge://') || url.startsWith('about:') || url.startsWith('chrome-extension://')) {
+        throw new Error('Cannot analyze browser internal pages. Please switch to a public webpage (e.g. a news article, blog, or Wikipedia) or use the "Paste Text" tab.');
+      }
+
       // Notify loading
       browser.runtime.sendMessage({ type: 'ANALYSIS_LOADING' }).catch(() => {});
 
-      // Extract text from content script
-      const extractedText = await browser.tabs.sendMessage(tabId, { type: 'EXTRACT_TEXT' });
-      if (!extractedText || typeof extractedText !== 'string') {
-        throw new Error('Failed to extract text from the page.');
+      // Extract text from content script, with fallback injection
+      let extractedText: string | null = null;
+      try {
+        extractedText = await browser.tabs.sendMessage(tabId, { type: 'EXTRACT_TEXT' });
+      } catch (connErr) {
+        // Tab was likely opened before extension was loaded/reloaded.
+        // Try programmatic injection using chrome.scripting
+        if (chrome.scripting && chrome.scripting.executeScript) {
+          try {
+            await chrome.scripting.executeScript({
+              target: { tabId },
+              files: ['content-scripts/content.js']
+            });
+            await new Promise(r => setTimeout(r, 150));
+            extractedText = await browser.tabs.sendMessage(tabId, { type: 'EXTRACT_TEXT' });
+          } catch (injectErr) {
+            console.warn('Script injection failed:', injectErr);
+          }
+        }
+      }
+
+      if (!extractedText || typeof extractedText !== 'string' || extractedText.trim().length === 0) {
+        throw new Error('Could not extract text from this page. Please refresh the page tab (F5) and try again, or use "Paste Text".');
       }
 
       // Get API key
@@ -91,9 +118,13 @@ export default defineBackground(() => {
 
     } catch (error: any) {
       console.error('Page analysis error:', error);
+      let userMsg = error.message || 'An error occurred during analysis.';
+      if (userMsg.includes('Could not establish connection')) {
+        userMsg = 'Cannot connect to this tab. Please refresh the page tab (F5) and try again, or use "Paste Text".';
+      }
       browser.runtime.sendMessage({ 
         type: 'ANALYSIS_ERROR', 
-        error: error.message || 'An error occurred during analysis.' 
+        error: userMsg
       }).catch(() => {});
     }
   }
