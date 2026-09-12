@@ -16,10 +16,10 @@ Analyze the provided text and identify instances of the following 13 bias types:
 13. whataboutism: Deflecting criticism by pointing to someone else's faults.
 
 Guidelines:
-- Return the EXACT substring from the text in the "quote" field for each bias found.
+- Return the EXACT substring from the text in the "quote" field for each bias found. Keep quotes concise (1 to 2 sentences max) so they can be matched and highlighted directly in the document.
 - Assess neutrality score (0-100), where 100 is completely neutral and objective, and 0 is heavily biased/manipulative.
 - Provide a brief summary of the overall bias profile.
-- Write a completely neutral, objective rewrite of the original text.
+- For rewrittenText: If the original text is under 3,000 characters, provide a complete neutral rewrite. If the text is a long article or full webpage, provide an objective, neutral synthesis of the key biased assertions and thesis (up to 300 words) so the response stays within JSON token limits.
 - Respond ONLY with a JSON object matching the requested schema.`;
 
 export const RESPONSE_SCHEMA = {

@@ -9,14 +9,35 @@ export function matchSpans(arg1: any, arg2: any): BiasInstance[] {
   return biases.map(bias => {
     if (!bias.quote) return bias;
     
-    // Exact match
+    // 1. Exact match
     let startIndex = text.indexOf(bias.quote);
     
-    // Case-insensitive match if exact match fails
+    // 2. Case-insensitive match if exact match fails
     if (startIndex === -1) {
       const lowerText = text.toLowerCase();
       const lowerQuote = bias.quote.toLowerCase();
       startIndex = lowerText.indexOf(lowerQuote);
+    }
+
+    // 3. Flexible whitespace / regex match
+    if (startIndex === -1) {
+      try {
+        const words = bias.quote.trim().split(/\s+/).filter(Boolean);
+        if (words.length > 0) {
+          const escaped = words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('\\s+');
+          const re = new RegExp(escaped, 'i');
+          const match = re.exec(text);
+          if (match) {
+            return {
+              ...bias,
+              startIndex: match.index,
+              endIndex: match.index + match[0].length
+            };
+          }
+        }
+      } catch (e) {
+        // Fall back gracefully
+      }
     }
     
     if (startIndex !== -1) {

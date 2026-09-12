@@ -103,7 +103,7 @@ export default defineBackground(() => {
       // Match spans
       const matchedResult = {
         ...result,
-        biases: matchSpans(extractedText, result.biases)
+        biases: matchSpans(result.originalText, result.biases)
       };
 
       // Send result back to side panel
@@ -113,7 +113,7 @@ export default defineBackground(() => {
       browser.tabs.sendMessage(tabId, { 
         type: 'HIGHLIGHT_BIASES', 
         biases: matchedResult.biases,
-        originalText: extractedText
+        originalText: result.originalText
       }).catch(console.error);
 
     } catch (error: any) {

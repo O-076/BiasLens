@@ -2,7 +2,7 @@ import { GoogleGenerativeAI, Schema } from '@google/generative-ai';
 import { AnalysisResult, BiasInstance } from '@/types/analysis';
 import { buildAnalysisPrompt, RESPONSE_SCHEMA } from './prompts';
 
-const MAX_TEXT_LENGTH = 15000;
+const MAX_TEXT_LENGTH = 65000;
 
 function generateId(): string {
   return Math.random().toString(36).substring(2, 15);
