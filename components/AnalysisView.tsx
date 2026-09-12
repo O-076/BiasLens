@@ -105,11 +105,18 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({ result, activeFilter
   const uniqueTypes = new Set(result.biases.map(b => b.type)).size;
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="px-4 py-3 border-b text-xs font-medium" style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>
-        {result.biases.length} biases detected across {uniqueTypes} types
+    <div 
+      className="rounded-xl border overflow-hidden transition-colors"
+      style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+    >
+      <div 
+        className="px-3.5 py-2 border-b text-[10px] font-mono uppercase tracking-wider flex items-center justify-between" 
+        style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+      >
+        <span>Annotated Source Text</span>
+        <span>{result.biases.length} Findings · {uniqueTypes} Categories</span>
       </div>
-      <div className="p-4 overflow-y-auto max-h-[60vh]">
+      <div className="p-3.5 overflow-y-auto max-h-[45vh] scrollbar-thin">
         {renderTextWithHighlights()}
       </div>
     </div>

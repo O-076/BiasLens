@@ -47,59 +47,83 @@ export const RewritePanel: React.FC<RewritePanelProps> = ({ originalText, rewrit
   };
 
   return (
-    <div className="flex flex-col border-y" style={{ borderColor: 'var(--border)' }}>
+    <div 
+      className="rounded-xl border overflow-hidden transition-colors"
+      style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+    >
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center justify-between p-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+        className="w-full flex items-center justify-between p-3.5 hover:bg-slate-500/5 transition-colors select-none text-left"
       >
         <div className="flex items-center gap-2">
-          <Wand2 size={16} className="text-blue-500" />
-          <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>View Neutral Rewrite</span>
+          <Wand2 size={14} className="text-blue-500" />
+          <span className="font-semibold text-xs tracking-tight" style={{ color: 'var(--text-primary)' }}>
+            Editorial Neutral Rewrite
+          </span>
         </div>
-        {isExpanded ? <ChevronDown size={18} style={{ color: 'var(--text-secondary)' }} /> : <ChevronRight size={18} style={{ color: 'var(--text-secondary)' }} />}
+        {isExpanded ? (
+          <ChevronDown size={14} style={{ color: 'var(--text-secondary)' }} />
+        ) : (
+          <ChevronRight size={14} style={{ color: 'var(--text-secondary)' }} />
+        )}
       </button>
 
-      <div 
-        className="overflow-hidden transition-all duration-300 ease-in-out"
-        style={{ maxHeight: isExpanded ? '1000px' : '0' }}
-      >
-        <div className="p-4 pt-0 flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <div className="flex bg-black/5 dark:bg-white/5 p-0.5 rounded-md" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+      {isExpanded && (
+        <div 
+          className="p-3.5 pt-0 flex flex-col gap-3 border-t text-xs animate-fade-in"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          <div className="flex items-center justify-between pt-2.5">
+            <div 
+              className="flex p-0.5 rounded-lg border select-none"
+              style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border)' }}
+            >
               <button
                 onClick={() => setViewMode('clean')}
-                className={`px-2.5 py-1 text-xs font-medium rounded-sm transition-all ${viewMode === 'clean' ? 'bg-white dark:bg-zinc-700 shadow-sm' : 'opacity-70'}`}
+                className={`px-2.5 py-1 text-[11px] font-medium rounded-md transition-all ${
+                  viewMode === 'clean' 
+                    ? 'bg-slate-200/80 dark:bg-slate-800 shadow-sm font-semibold' 
+                    : 'opacity-60 hover:opacity-100'
+                }`}
                 style={{ color: viewMode === 'clean' ? 'var(--text-primary)' : 'var(--text-secondary)' }}
               >
-                Clean
+                Clean Output
               </button>
               <button
                 onClick={() => setViewMode('changes')}
-                className={`px-2.5 py-1 text-xs font-medium rounded-sm transition-all ${viewMode === 'changes' ? 'bg-white dark:bg-zinc-700 shadow-sm' : 'opacity-70'}`}
+                className={`px-2.5 py-1 text-[11px] font-medium rounded-md transition-all ${
+                  viewMode === 'changes' 
+                    ? 'bg-slate-200/80 dark:bg-slate-800 shadow-sm font-semibold' 
+                    : 'opacity-60 hover:opacity-100'
+                }`}
                 style={{ color: viewMode === 'changes' ? 'var(--text-primary)' : 'var(--text-secondary)' }}
               >
-                Changes
+                Diff Comparison
               </button>
             </div>
             
             <button
               onClick={handleCopy}
-              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              style={{ color: 'var(--text-secondary)' }}
+              className="flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-md border hover:bg-slate-500/10 transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
             >
-              {copied ? <Check size={14} className="text-green-500" /> : <ClipboardCopy size={14} />}
-              {copied ? 'Copied!' : 'Copy'}
+              {copied ? <Check size={12} className="text-emerald-500" /> : <ClipboardCopy size={12} />}
+              <span>{copied ? 'Copied to Clipboard' : 'Copy Text'}</span>
             </button>
           </div>
 
           <div 
-            className="p-3 rounded-lg text-sm leading-relaxed whitespace-pre-wrap border"
-            style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+            className="p-3 rounded-lg text-xs leading-relaxed whitespace-pre-wrap border font-serif"
+            style={{ 
+              backgroundColor: 'var(--bg-primary)', 
+              borderColor: 'var(--border)', 
+              color: 'var(--text-primary)' 
+            }}
           >
             {viewMode === 'clean' ? rewrittenText : renderDiff()}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

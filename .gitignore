@@ -7,3 +7,9 @@ dist/
 .env.local
 .DS_Store
 Thumbs.db
+.agent/
+.agents/
+.claude/
+.codex/
+.cursor/
+.gemini/

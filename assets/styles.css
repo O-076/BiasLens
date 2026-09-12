@@ -5,50 +5,72 @@
 @layer base {
   :root {
     --bg-primary: #ffffff;
-    --bg-secondary: #f9fafb;
-    --bg-tertiary: #f3f4f6;
-    --text-primary: #111827;
-    --text-secondary: #6b7280;
-    --text-tertiary: #9ca3af;
-    --border: #e5e7eb;
-    --accent: #3b82f6;
+    --bg-secondary: #f8fafc;
+    --bg-tertiary: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-tertiary: #94a3b8;
+    --border: #e2e8f0;
+    --border-subtle: #f1f5f9;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --surface-card: #ffffff;
+    --surface-elevated: #ffffff;
   }
 
   .dark {
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --bg-tertiary: #334155;
-    --text-primary: #f1f5f9;
+    --bg-primary: #090d16;
+    --bg-secondary: #0f1726;
+    --bg-tertiary: #172238;
+    --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --text-tertiary: #64748b;
-    --border: #334155;
-    --accent: #60a5fa;
+    --border: #1e293b;
+    --border-subtle: #131c2e;
+    --accent: #3b82f6;
+    --accent-hover: #60a5fa;
+    --surface-card: #0d1424;
+    --surface-elevated: #111a2e;
   }
 
   body {
-    @apply bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-200;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    @apply bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-150 antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     margin: 0;
     padding: 0;
     min-width: 360px;
+    letter-spacing: -0.011em;
+  }
+
+  ::selection {
+    background-color: rgba(59, 130, 246, 0.25);
+    color: inherit;
   }
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: var(--text-tertiary) transparent;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 9999px;
   }
 }
 
 @layer components {
-  .bias-highlight {
-    @apply cursor-pointer transition-all duration-150;
-    border-bottom: 2px solid var(--highlight-color);
-    background-color: color-mix(in srgb, var(--highlight-color) 15%, transparent);
-    border-radius: 2px;
-    padding: 1px 0;
-  }
-
-  .bias-highlight:hover {
-    background-color: color-mix(in srgb, var(--highlight-color) 30%, transparent);
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
 }
+

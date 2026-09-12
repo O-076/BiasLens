@@ -19,7 +19,6 @@ interface BiasLegendProps {
 export const BiasLegend: React.FC<BiasLegendProps> = ({ detectedTypes, activeFilter, onFilterChange }) => {
   if (detectedTypes.length === 0) return null;
 
-  // Create a counts object just based on the array provided
   const counts = detectedTypes.reduce((acc, type) => {
     acc[type] = (acc[type] || 0) + 1;
     return acc;
@@ -28,29 +27,49 @@ export const BiasLegend: React.FC<BiasLegendProps> = ({ detectedTypes, activeFil
   const uniqueTypes = Array.from(new Set(detectedTypes));
 
   return (
-    <div className="flex gap-2 overflow-x-auto p-3 border-b scrollbar-hide" style={{ borderColor: 'var(--border)' }}>
-      {uniqueTypes.map(type => {
-        const isActive = activeFilter === type;
-        const color = BIAS_COLORS[type] || '#888';
-        const label = type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-        
-        return (
-          <button
-            key={type}
-            onClick={() => onFilterChange(isActive ? null : type)}
-            className={`flex items-center whitespace-nowrap gap-1.5 px-2.5 py-1 text-xs rounded-full border transition-all ${isActive ? 'shadow-sm' : 'opacity-80'}`}
-            style={{ 
-              backgroundColor: isActive ? `${color}15` : 'transparent',
-              borderColor: isActive ? color : 'var(--border)',
-              color: 'var(--text-primary)'
-            }}
+    <div className="flex flex-col gap-1.5 select-none">
+      <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider px-0.5 opacity-50" style={{ color: 'var(--text-secondary)' }}>
+        <span>Filter by category</span>
+        {activeFilter && (
+          <button 
+            onClick={() => onFilterChange(null)}
+            className="hover:text-blue-500 font-semibold transition-colors"
           >
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
-            <span>{label}</span>
-            <span className="font-semibold opacity-60 ml-0.5">{counts[type]}</span>
+            Clear filter
           </button>
-        );
-      })}
+        )}
+      </div>
+
+      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+        {uniqueTypes.map(type => {
+          const isActive = activeFilter === type;
+          const color = BIAS_COLORS[type] || '#3b82f6';
+          const label = type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+          
+          return (
+            <button
+              key={type}
+              onClick={() => onFilterChange(isActive ? null : type)}
+              className={`flex items-center whitespace-nowrap gap-1.5 px-2 py-1 text-[11px] rounded-lg border transition-all ${
+                isActive 
+                  ? 'ring-1 font-semibold' 
+                  : 'hover:bg-slate-500/5'
+              }`}
+              style={{ 
+                backgroundColor: isActive ? `${color}18` : 'var(--bg-secondary)',
+                borderColor: isActive ? color : 'var(--border)',
+                color: 'var(--text-primary)'
+              }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
+              <span>{label}</span>
+              <span className="font-mono text-[10px] opacity-50 tabular-nums">
+                {counts[type]}
+              </span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };

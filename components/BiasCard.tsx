@@ -11,10 +11,10 @@ const BIAS_COLORS: Record<string, string> = {
   whataboutism: '#8b5cf6'
 };
 
-const SEVERITY_COLORS = {
-  low: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  medium: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-  high: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+const SEVERITY_BADGES = {
+  low: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
+  medium: 'text-amber-500 bg-amber-500/10 border-amber-500/20',
+  high: 'text-rose-500 bg-rose-500/10 border-rose-500/20'
 };
 
 interface BiasCardProps {
@@ -30,68 +30,104 @@ export const BiasCard: React.FC<BiasCardProps> = ({ bias, isExpanded, onToggle, 
 
   return (
     <div 
-      className="rounded-xl overflow-hidden mb-3 border transition-all"
+      className="rounded-xl border transition-all overflow-hidden"
       style={{ 
         backgroundColor: 'var(--bg-secondary)', 
-        borderColor: 'var(--border)',
-        borderLeftWidth: '4px',
-        borderLeftColor: typeColor
+        borderColor: isExpanded ? 'var(--border)' : 'var(--border)'
       }}
     >
       <div 
         onClick={onToggle}
-        className="p-3 flex items-center justify-between cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+        className="p-3.5 flex items-start justify-between cursor-pointer hover:bg-slate-500/5 transition-colors select-none"
       >
-        <div className="flex flex-col gap-1.5 flex-1 overflow-hidden">
+        <div className="flex flex-col gap-1.5 flex-1 pr-3">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: typeColor }} />
-            <span className="font-semibold text-sm truncate" style={{ color: 'var(--text-primary)' }}>{displayType}</span>
-            <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${SEVERITY_COLORS[bias.severity]}`}>
-              {bias.severity.charAt(0).toUpperCase() + bias.severity.slice(1)}
+            <span 
+              className="w-2 h-2 rounded-full shrink-0" 
+              style={{ backgroundColor: typeColor }} 
+            />
+            <span className="font-semibold text-xs tracking-tight" style={{ color: 'var(--text-primary)' }}>
+              {displayType}
+            </span>
+            <span className={`text-[9px] font-mono uppercase px-1.5 py-0.5 rounded border font-semibold tracking-wider ${SEVERITY_BADGES[bias.severity]}`}>
+              {bias.severity}
             </span>
           </div>
+
           {!isExpanded && (
-            <p className="text-xs truncate italic opacity-80" style={{ color: 'var(--text-secondary)' }}>
-              "{bias.quote.length > 50 ? bias.quote.substring(0, 50) + '...' : bias.quote}"
+            <p className="text-xs italic truncate opacity-70 font-serif" style={{ color: 'var(--text-secondary)' }}>
+              "{bias.quote}"
             </p>
           )}
         </div>
-        <button className="p-1 opacity-50 hover:opacity-100 transition-opacity">
-          {isExpanded ? <ChevronUp size={16} style={{ color: 'var(--text-primary)' }}/> : <ChevronDown size={16} style={{ color: 'var(--text-primary)' }}/>}
+
+        <button 
+          className="p-1 rounded opacity-50 hover:opacity-100 transition-opacity shrink-0 mt-0.5"
+          aria-label={isExpanded ? "Collapse finding" : "Expand finding"}
+        >
+          {isExpanded ? (
+            <ChevronUp size={14} style={{ color: 'var(--text-primary)' }} />
+          ) : (
+            <ChevronDown size={14} style={{ color: 'var(--text-primary)' }} />
+          )}
         </button>
       </div>
 
-      <div 
-        className={`transition-all duration-300 ease-in-out overflow-hidden`}
-        style={{ maxHeight: isExpanded ? '500px' : '0' }}
-      >
-        <div className="p-3 pt-0 border-t flex flex-col gap-3" style={{ borderColor: 'var(--border)' }}>
-          <div className="p-2.5 mt-2 rounded-lg bg-black/5 dark:bg-white/5 text-sm italic border-l-2" style={{ borderLeftColor: typeColor, color: 'var(--text-primary)' }}>
+      {isExpanded && (
+        <div 
+          className="p-3.5 pt-0 flex flex-col gap-3.5 border-t text-xs animate-fade-in"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          {/* Quoted Text Block */}
+          <div 
+            className="p-3 mt-3 rounded-lg border font-serif italic text-xs leading-relaxed"
+            style={{ 
+              backgroundColor: 'var(--bg-primary)', 
+              borderColor: 'var(--border)', 
+              color: 'var(--text-primary)' 
+            }}
+          >
             "{bias.quote}"
           </div>
           
-          <div>
-            <span className="text-xs font-semibold uppercase tracking-wider mb-1 block" style={{ color: 'var(--text-tertiary)' }}>Why it's biased:</span>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{bias.explanation}</p>
+          {/* Critique Section */}
+          <div className="space-y-1">
+            <span className="text-[10px] font-mono uppercase tracking-wider opacity-50 block" style={{ color: 'var(--text-secondary)' }}>
+              Analysis & Impact
+            </span>
+            <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+              {bias.explanation}
+            </p>
           </div>
           
-          <div>
-            <span className="text-xs font-semibold uppercase tracking-wider mb-1 block" style={{ color: 'var(--text-tertiary)' }}>Neutral alternative:</span>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{bias.suggestion}</p>
+          {/* Neutral Alternative */}
+          <div 
+            className="p-2.5 rounded-lg border flex flex-col gap-1"
+            style={{ 
+              backgroundColor: 'rgba(34, 197, 94, 0.05)', 
+              borderColor: 'rgba(34, 197, 94, 0.2)' 
+            }}
+          >
+            <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-semibold">
+              Balanced Alternative
+            </span>
+            <p className="text-xs leading-relaxed text-emerald-800 dark:text-emerald-200">
+              {bias.suggestion}
+            </p>
           </div>
 
           {onLocate && (
             <button 
               onClick={(e) => { e.stopPropagation(); onLocate(); }}
-              className="mt-1 flex items-center justify-center gap-1.5 w-full py-2 text-xs font-medium rounded-lg border hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              className="flex items-center justify-center gap-1.5 w-full py-1.5 text-xs font-medium rounded-md border hover:bg-slate-500/10 transition-colors"
               style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
             >
-              <MapPin size={14} />
-              Show on page
+              <MapPin size={12} />
+              <span>Highlight on page</span>
             </button>
           )}
         </div>
-      </div>
+      )}
     </div>
   );
 };
