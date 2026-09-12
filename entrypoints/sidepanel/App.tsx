@@ -284,6 +284,7 @@ export default function App() {
                 <RewritePanel 
                   originalText={result.originalText} 
                   rewrittenText={result.rewrittenText} 
+                  biases={result.biases}
                 />
               </div>
             )}
