@@ -3,28 +3,42 @@ import { X, Eye, EyeOff, ExternalLink } from 'lucide-react';
 
 interface SettingsProps {
   apiKey: string;
-  onApiKeyChange: (key: string) => void;
-  onClose: () => void;
+  onApiKeyChange?: (key: string) => void;
+  onSave?: (key: string) => void;
+  onClose?: () => void;
 }
 
-export const Settings: React.FC<SettingsProps> = ({ apiKey, onApiKeyChange, onClose }) => {
+export const Settings: React.FC<SettingsProps> = ({ apiKey, onApiKeyChange, onSave, onClose }) => {
   const [localKey, setLocalKey] = useState(apiKey);
   const [showKey, setShowKey] = useState(false);
   const [savedStatus, setSavedStatus] = useState(false);
 
   const handleSave = () => {
-    onApiKeyChange(localKey);
+    if (onSave) {
+      onSave(localKey);
+    } else if (onApiKeyChange) {
+      onApiKeyChange(localKey);
+    }
     setSavedStatus(true);
-    setTimeout(() => setSavedStatus(false), 2000);
+    setTimeout(() => {
+      setSavedStatus(false);
+      if (onClose) onClose();
+    }, 1000);
   };
 
   return (
-    <div className="absolute inset-0 z-50 flex flex-col" style={{ backgroundColor: 'var(--bg-primary)' }}>
+    <div className="absolute inset-0 z-50 flex flex-col shadow-2xl animate-fade-in" style={{ backgroundColor: 'var(--bg-primary)' }}>
       <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: 'var(--border)' }}>
         <h2 className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>Settings</h2>
-        <button onClick={onClose} className="p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
-          <X size={20} style={{ color: 'var(--text-secondary)' }} />
-        </button>
+        {onClose && (
+          <button 
+            onClick={onClose} 
+            className="p-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+            title="Close Settings"
+          >
+            <X size={20} style={{ color: 'var(--text-secondary)' }} />
+          </button>
+        )}
       </div>
 
       <div className="p-4 flex flex-col gap-6 flex-1 overflow-y-auto">

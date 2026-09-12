@@ -12,6 +12,7 @@ import { BiasCard } from '@/components/BiasCard';
 import { RewritePanel } from '@/components/RewritePanel';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { browser } from 'wxt/browser';
+import { EXAMPLE_TEXTS } from '@/lib/examples';
 
 type AnalysisStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -126,7 +127,7 @@ export default function App() {
   const detectedTypes = result ? Array.from(new Set(result.biases.map(b => b.type))) : [];
 
   return (
-    <div className="flex flex-col min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
+    <div className="flex flex-col min-h-screen relative bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
       <Header 
         darkMode={darkMode} 
         onToggleDarkMode={handleToggleDarkMode}
@@ -136,7 +137,11 @@ export default function App() {
 
       <main className="flex-1 p-4 overflow-y-auto">
         {showSettings ? (
-          <Settings apiKey={apiKey} onSave={handleSaveApiKey} />
+          <Settings 
+            apiKey={apiKey} 
+            onSave={handleSaveApiKey} 
+            onClose={() => setShowSettings(false)} 
+          />
         ) : (
           <div className="flex flex-col gap-6 max-w-2xl mx-auto w-full">
             
@@ -146,12 +151,17 @@ export default function App() {
                   mode={mode} 
                   onModeChange={setMode} 
                   onAnalyzePage={handleAnalyzePage}
-                  onAnalyzeText={handleAnalyzeText}
-                  isTextEmpty={!inputText.trim()}
+                  isLoading={status === 'loading'}
                 />
                 
                 {mode === 'text' && (
-                  <TextInput value={inputText} onChange={setInputText} />
+                  <TextInput 
+                    value={inputText} 
+                    onChange={setInputText} 
+                    onAnalyze={handleAnalyzeText}
+                    isLoading={status === 'loading'}
+                    examples={EXAMPLE_TEXTS}
+                  />
                 )}
               </div>
             )}
@@ -198,7 +208,7 @@ export default function App() {
                     <AnalysisView 
                       result={result} 
                       activeFilter={activeFilter} 
-                      onBiasClick={(id) => setExpandedBiasId(expandedBiasId === id ? null : id)} 
+                      onBiasClick={(bias) => setExpandedBiasId(expandedBiasId === bias.id ? null : bias.id)} 
                     />
 
                     <div className="space-y-4">

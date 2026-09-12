@@ -71,12 +71,12 @@ export default defineBackground(() => {
       }
 
       // Analyze text
-      const result = await analyzeText(extractedText, apiKey);
+      const result = await analyzeText(apiKey, extractedText);
       
       // Match spans
       const matchedResult = {
         ...result,
-        biases: matchSpans(result.biases, extractedText)
+        biases: matchSpans(extractedText, result.biases)
       };
 
       // Send result back to side panel
@@ -111,12 +111,12 @@ export default defineBackground(() => {
       }
 
       // Analyze text
-      const result = await analyzeText(text, apiKey);
+      const result = await analyzeText(apiKey, text);
       
       // Match spans
       const matchedResult = {
         ...result,
-        biases: matchSpans(result.biases, text)
+        biases: matchSpans(text, result.biases)
       };
 
       // Send result back to side panel

@@ -1,6 +1,11 @@
 import { BiasInstance } from '@/types/analysis';
 
-export function matchSpans(text: string, biases: BiasInstance[]): BiasInstance[] {
+export function matchSpans(arg1: any, arg2: any): BiasInstance[] {
+  const text: string = typeof arg1 === 'string' ? arg1 : (typeof arg2 === 'string' ? arg2 : '');
+  const biases: BiasInstance[] = Array.isArray(arg1) ? arg1 : (Array.isArray(arg2) ? arg2 : []);
+
+  if (!text || !biases || biases.length === 0) return biases || [];
+
   return biases.map(bias => {
     if (!bias.quote) return bias;
     

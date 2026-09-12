@@ -4,12 +4,22 @@ import { Sun, Moon, Settings, Search } from 'lucide-react';
 interface HeaderProps {
   darkMode: boolean;
   onToggleDarkMode: () => void;
-  onOpenSettings: () => void;
+  showSettings?: boolean;
+  onOpenSettings?: () => void;
+  onToggleSettings?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, onOpenSettings }) => {
+export const Header: React.FC<HeaderProps> = ({ 
+  darkMode, 
+  onToggleDarkMode, 
+  showSettings = false,
+  onOpenSettings,
+  onToggleSettings 
+}) => {
+  const handleSettings = onToggleSettings || onOpenSettings || (() => {});
+
   return (
-    <header className="flex items-center justify-between px-4 py-2 border-b" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+    <header className="flex items-center justify-between px-4 py-2 border-b select-none" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
       <div className="flex items-center gap-2">
         <div className="flex items-center justify-center w-6 h-6 bg-blue-500 rounded-md text-white text-xs shadow-sm">
           <Search size={14} className="text-white" />
@@ -28,11 +38,11 @@ export const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, onOp
           {darkMode ? <Sun size={16} style={{ color: 'var(--text-secondary)' }} /> : <Moon size={16} style={{ color: 'var(--text-secondary)' }} />}
         </button>
         <button 
-          onClick={onOpenSettings} 
-          className="p-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-          title="Settings"
+          onClick={handleSettings} 
+          className={`p-1.5 rounded-md transition-colors ${showSettings ? 'bg-blue-500/10 text-blue-500' : 'hover:bg-black/5 dark:hover:bg-white/10'}`}
+          title={showSettings ? "Close settings" : "Settings"}
         >
-          <Settings size={16} style={{ color: 'var(--text-secondary)' }} />
+          <Settings size={16} style={{ color: showSettings ? '#3b82f6' : 'var(--text-secondary)' }} />
         </button>
       </div>
     </header>

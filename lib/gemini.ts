@@ -8,9 +8,17 @@ function generateId(): string {
   return Math.random().toString(36).substring(2, 15);
 }
 
-export async function analyzeText(apiKey: string, text: string): Promise<AnalysisResult> {
-  if (!apiKey) {
-    throw new Error('API key is required');
+export async function analyzeText(arg1: string, arg2: string): Promise<AnalysisResult> {
+  // Support both (apiKey, text) and (text, apiKey)
+  let apiKey = arg1;
+  let text = arg2;
+  if (arg1.length > 200 && arg2.length < 200) {
+    apiKey = arg2;
+    text = arg1;
+  }
+
+  if (!apiKey || !apiKey.trim()) {
+    throw new Error('API key is required. Please set your Gemini API key in Settings.');
   }
 
   let textToAnalyze = text;
@@ -19,9 +27,9 @@ export async function analyzeText(apiKey: string, text: string): Promise<Analysi
     textToAnalyze = text.substring(0, MAX_TEXT_LENGTH);
   }
 
-  const genAI = new GoogleGenerativeAI(apiKey);
+  const genAI = new GoogleGenerativeAI(apiKey.trim());
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-1.5-flash',
     generationConfig: {
       responseMimeType: 'application/json',
       responseSchema: RESPONSE_SCHEMA as Schema,

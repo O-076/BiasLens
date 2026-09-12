@@ -16,15 +16,24 @@ interface TextInputProps {
   examples: Example[];
 }
 
-export const TextInput: React.FC<TextInputProps> = ({ value, onChange, onAnalyze, isLoading, examples }) => {
+export const TextInput: React.FC<TextInputProps> = ({ 
+  value, 
+  onChange, 
+  onAnalyze, 
+  isLoading, 
+  examples = [] 
+}) => {
   const maxLength = 15000;
   const isNearLimit = value.length > maxLength * 0.9;
   const isOverLimit = value.length > maxLength;
 
   const renderIcon = (iconName: string) => {
-    // Basic mapping for safety, normally we'd dynamic import or map
-    const IconComponent = (Icons as any)[iconName] || Icons.FileText;
-    return <IconComponent size={14} className="mr-1" />;
+    if (iconName === 'newspaper') return <Icons.Newspaper size={14} className="mr-1 shrink-0" />;
+    if (iconName === 'megaphone') return <Icons.Megaphone size={14} className="mr-1 shrink-0" />;
+    if (iconName === 'message-circle') return <Icons.MessageCircle size={14} className="mr-1 shrink-0" />;
+    const pascal = iconName.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('');
+    const IconComponent = (Icons as any)[pascal] || (Icons as any)[iconName] || Icons.FileText;
+    return <IconComponent size={14} className="mr-1 shrink-0" />;
   };
 
   return (
