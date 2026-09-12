@@ -24,16 +24,14 @@ function cleanJson(str: string): string {
 
 async function getAvailableModels(apiKey: string): Promise<string[]> {
   const priority = [
-    'gemini-3.6-flash',
-    'gemini-2.5-flash',
     'gemini-2.0-flash',
-    'gemini-1.5-flash-latest',
     'gemini-1.5-flash',
-    'gemini-2.0-flash-exp',
+    'gemini-1.5-flash-latest',
     'gemini-1.5-flash-002',
     'gemini-1.5-flash-001',
-    'gemini-1.5-pro-latest',
-    'gemini-1.5-pro'
+    'gemini-1.5-flash-8b',
+    'gemini-1.5-pro',
+    'gemini-1.5-pro-latest'
   ];
 
   try {
@@ -43,15 +41,20 @@ async function getAvailableModels(apiKey: string): Promise<string[]> {
       if (Array.isArray(data.models)) {
         const available: string[] = data.models
           .filter((m: any) => m.supportedGenerationMethods?.includes('generateContent'))
-          .map((m: any) => m.name.replace(/^models\//, ''));
+          .map((m: any) => m.name.replace(/^models\//, ''))
+          // Filter out preview/experimental/omni/embed models that have zero free tier quota
+          .filter((name: string) => 
+            !name.includes('preview') && 
+            !name.includes('omni') && 
+            !name.includes('embed') &&
+            !name.includes('imagen') &&
+            !name.includes('exp')
+          );
         
-        // Prioritize any flash models from the API response in descending order (newest first)
-        const flashModels = available
-          .filter((m: string) => m.includes('flash'))
-          .sort((a, b) => b.localeCompare(a));
-        
-        const combined = Array.from(new Set([...flashModels, ...priority, ...available]));
-        if (combined.length > 0) return combined;
+        // Match against preferred standard models first
+        const matched = priority.filter(p => available.includes(p));
+        if (matched.length > 0) return matched;
+        if (available.length > 0) return available;
       }
     }
   } catch (e) {
@@ -123,6 +126,11 @@ export async function analyzeText(arg1: string, arg2: string): Promise<AnalysisR
       console.warn(`Attempt with model "${modelName}" failed:`, error.message);
       lastError = error;
 
+      // If this model has limit: 0 (restricted preview), continue to standard free models!
+      if (error.message?.includes('limit: 0')) {
+        continue;
+      }
+
       // If Google suggests a specific model in the error message, queue it to try next!
       const suggestionMatch = error.message?.match(/use models\/([a-zA-Z0-9.-]+)/i);
       if (suggestionMatch && suggestionMatch[1] && !attempted.has(suggestionMatch[1])) {
@@ -134,12 +142,17 @@ export async function analyzeText(arg1: string, arg2: string): Promise<AnalysisR
         continue;
       }
 
-      // If error is quota or invalid key, stop and throw immediately
-      if (error.message?.includes('API_KEY_INVALID') || error.message?.includes('quota')) {
-        throw error;
+      // If error is invalid key, stop and throw immediately
+      if (error.message?.includes('API_KEY_INVALID')) {
+        throw new Error('Invalid Gemini API key. Please verify your key in Settings.');
       }
     }
   }
 
-  throw new Error(lastError?.message || 'Failed to analyze text with available Gemini models.');
+  // Format a friendly error message
+  let displayMsg = lastError?.message || 'Failed to analyze text with Gemini.';
+  if (displayMsg.includes('quota') || displayMsg.includes('429')) {
+    displayMsg = 'Gemini API free quota limit reached. Please wait a minute and try again.';
+  }
+  throw new Error(displayMsg);
 }
