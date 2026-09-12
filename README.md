@@ -2,6 +2,8 @@
 
 > **Read between the lines.** An editorial-grade Chrome browser extension powered by Google Gemini AI that detects cognitive biases, logical fallacies, and manipulative rhetoric in webpages and text passages in real-time. Highlights biased claims directly on the page, calibrates an objective Neutrality Index, and provides surgical sentence-by-sentence neutral revisions.
 
+![BiasLens Showcase](thumbnail.png)
+
 [![Chrome MV3](https://img.shields.io/badge/Platform-Chrome%20Extension%20MV3-blue?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/mv3/)
 [![AI Engine](https://img.shields.io/badge/AI-Google%20Gemini%202.0%2F1.5%20Flash-orange?logo=google&logoColor=white)](https://ai.google.dev/)
 [![Framework](https://img.shields.io/badge/Built%20With-WXT%20%2B%20React%2018%20%2B%20Vite-61dafb?logo=react&logoColor=black)](https://wxt.dev/)
