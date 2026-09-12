@@ -102,6 +102,8 @@ export async function analyzeText(arg1: string, arg2: string): Promise<AnalysisR
         generationConfig: {
           responseMimeType: 'application/json',
           responseSchema: RESPONSE_SCHEMA as Schema,
+          temperature: 0.1,
+          topP: 0.8,
         }
       });
 
@@ -110,10 +112,18 @@ export async function analyzeText(arg1: string, arg2: string): Promise<AnalysisR
       const cleaned = cleanJson(rawText);
       const parsedData = JSON.parse(cleaned);
 
-      const biases: BiasInstance[] = (parsedData.biases || []).map((bias: Omit<BiasInstance, 'id'>) => ({
-        ...bias,
-        id: generateId()
-      }));
+      const biases: BiasInstance[] = (parsedData.biases || []).map((bias: Omit<BiasInstance, 'id'>, idx: number) => {
+        let hash = 0;
+        const q = bias.quote || '';
+        for (let i = 0; i < q.length; i++) {
+          hash = ((hash << 5) - hash) + q.charCodeAt(i);
+          hash |= 0;
+        }
+        return {
+          ...bias,
+          id: `b_${bias.type || 'bias'}_${Math.abs(hash)}_${idx}`
+        };
+      });
 
       return {
         neutralityScore: parsedData.neutralityScore ?? 50,

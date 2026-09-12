@@ -1,7 +1,42 @@
 import { defineBackground } from 'wxt/sandbox';
 import { analyzeText } from '@/lib/gemini';
 import { matchSpans } from '@/lib/span-matcher';
-import { ExtensionMessage } from '@/types/analysis';
+import { ExtensionMessage, AnalysisResult } from '@/types/analysis';
+
+function computeContentCacheKey(text: string): string {
+  let hash = 5381;
+  const sample = text.trim();
+  const step = Math.max(1, Math.floor(sample.length / 500));
+  for (let i = 0; i < sample.length; i += step) {
+    hash = ((hash << 5) + hash) + sample.charCodeAt(i);
+    hash |= 0;
+  }
+  return `biaslens_cache_${Math.abs(hash)}_${sample.length}`;
+}
+
+async function saveToCache(key: string, data: AnalysisResult) {
+  try {
+    const res = await browser.storage.local.get('biaslens_recent_cache_keys');
+    const keys: string[] = Array.isArray(res.biaslens_recent_cache_keys) ? res.biaslens_recent_cache_keys : [];
+    
+    // Add current key to front
+    const newKeys = [key, ...keys.filter(k => k !== key)];
+    
+    // Maintain a bounded cache (max 30 items)
+    if (newKeys.length > 30) {
+      const toRemove = newKeys.slice(30);
+      await browser.storage.local.remove(toRemove);
+      newKeys.length = 30;
+    }
+    
+    await browser.storage.local.set({ 
+      [key]: data,
+      biaslens_recent_cache_keys: newKeys 
+    });
+  } catch (e) {
+    console.warn('Cache save warning:', e);
+  }
+}
 
 export default defineBackground(() => {
   // Setup side panel behavior on install
@@ -90,6 +125,20 @@ export default defineBackground(() => {
         throw new Error('Could not extract text from this page. Please refresh the page tab (F5) and try again, or use "Paste Text".');
       }
 
+      // Check deterministic content cache
+      const cacheKey = computeContentCacheKey(extractedText);
+      const cached = await browser.storage.local.get(cacheKey);
+      if (cached[cacheKey]) {
+        const cachedResult = cached[cacheKey] as AnalysisResult;
+        browser.runtime.sendMessage({ type: 'ANALYSIS_RESULT', result: cachedResult }).catch(() => {});
+        browser.tabs.sendMessage(tabId, { 
+          type: 'HIGHLIGHT_BIASES', 
+          biases: cachedResult.biases,
+          originalText: cachedResult.originalText
+        }).catch(console.error);
+        return;
+      }
+
       // Get API key
       const storage = await browser.storage.local.get('biaslens_api_key');
       const apiKey = storage.biaslens_api_key;
@@ -101,10 +150,13 @@ export default defineBackground(() => {
       const result = await analyzeText(apiKey, extractedText);
       
       // Match spans
-      const matchedResult = {
+      const matchedResult: AnalysisResult = {
         ...result,
         biases: matchSpans(result.originalText, result.biases)
       };
+
+      // Save to cache
+      await saveToCache(cacheKey, matchedResult);
 
       // Send result back to side panel
       browser.runtime.sendMessage({ type: 'ANALYSIS_RESULT', result: matchedResult }).catch(() => {});
@@ -134,6 +186,22 @@ export default defineBackground(() => {
       // Notify loading
       browser.runtime.sendMessage({ type: 'ANALYSIS_LOADING' }).catch(() => {});
 
+      // Check deterministic content cache
+      const cacheKey = computeContentCacheKey(text);
+      const cached = await browser.storage.local.get(cacheKey);
+      if (cached[cacheKey]) {
+        const cachedResult = cached[cacheKey] as AnalysisResult;
+        browser.runtime.sendMessage({ type: 'ANALYSIS_RESULT', result: cachedResult }).catch(() => {});
+        if (tabId) {
+          browser.tabs.sendMessage(tabId, { 
+            type: 'HIGHLIGHT_BIASES', 
+            biases: cachedResult.biases,
+            originalText: text
+          }).catch(() => {});
+        }
+        return;
+      }
+
       // Get API key
       const storage = await browser.storage.local.get('biaslens_api_key');
       const apiKey = storage.biaslens_api_key;
@@ -145,10 +213,13 @@ export default defineBackground(() => {
       const result = await analyzeText(apiKey, text);
       
       // Match spans
-      const matchedResult = {
+      const matchedResult: AnalysisResult = {
         ...result,
-        biases: matchSpans(text, result.biases)
+        biases: matchSpans(result.originalText, result.biases)
       };
+
+      // Save to cache
+      await saveToCache(cacheKey, matchedResult);
 
       // Send result back to side panel
       browser.runtime.sendMessage({ type: 'ANALYSIS_RESULT', result: matchedResult }).catch(() => {});
@@ -158,7 +229,7 @@ export default defineBackground(() => {
         browser.tabs.sendMessage(tabId, { 
           type: 'HIGHLIGHT_BIASES', 
           biases: matchedResult.biases,
-          originalText: text
+          originalText: result.originalText
         }).catch(() => {
            // Content script might not be injected, ignore
         });

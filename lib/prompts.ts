@@ -20,6 +20,8 @@ Guidelines:
 - In the "suggestion" field: Provide ONLY the exact, drop-in neutral replacement sentence for that quote. Do NOT include conversational preamble like "Try saying:" or "A better way would be:". Provide ONLY the objective, neutral replacement text ready to substitute directly into the text.
 - Assess neutrality score (0-100), where 100 is completely neutral and objective, and 0 is heavily biased/manipulative.
 - Provide a brief summary of the overall bias profile.
+- Consistency & Calibration: Apply strict, objective standards. Focus exclusively on clear, substantive rhetorical violations (emotional manipulation, unsupported framing, logical fallacies). Do not flag borderline or neutral stylistic choices. Identical text must produce identical rhetorical classifications.
+- Salience Ordering: Order the biases deterministically by importance and severity (high severity first), prioritizing the primary rhetorical issues.
 - In "rewrittenText": Return the text where ONLY the biased sentences are replaced by their neutral suggestions, leaving all other non-biased sentences and paragraphs completely unchanged. For very long articles (over 4,000 characters), provide the focused paragraphs where the biases occurred with only those biased sentences neutrally corrected.
 - Respond ONLY with a JSON object matching the requested schema.`;
 
