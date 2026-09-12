@@ -19,7 +19,7 @@ Get BiasLens running in your browser in under two minutes:
 
 ### 1. Clone & Build
 ```bash
-git clone https://github.com/O-076/BiasLens.git
+git clone https://github.com/O-076/BiasLens
 cd BiasLens
 npm install
 npm run build
