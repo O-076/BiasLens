@@ -7,7 +7,7 @@ export default defineConfig({
     description:
       'Detect cognitive biases in any text or webpage using AI. Highlights manipulative language, scores neutrality, and suggests balanced rewrites.',
     version: '1.0.0',
-    permissions: ['activeTab', 'sidePanel', 'contextMenus', 'storage', 'scripting'],
+    permissions: ['activeTab', 'tabs', 'sidePanel', 'contextMenus', 'storage', 'scripting'],
     action: {
       default_title: 'Open BiasLens',
     },

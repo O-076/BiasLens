@@ -58,7 +58,7 @@ export default defineBackground(() => {
       const tab = await browser.tabs.get(tabId);
       const url = tab.url || '';
 
-      if (!url || url.startsWith('chrome://') || url.startsWith('edge://') || url.startsWith('about:') || url.startsWith('chrome-extension://')) {
+      if (url && (url.startsWith('chrome://') || url.startsWith('edge://') || url.startsWith('about:') || url.startsWith('chrome-extension://'))) {
         throw new Error('Cannot analyze browser internal pages. Please switch to a public webpage (e.g. a news article, blog, or Wikipedia) or use the "Paste Text" tab.');
       }
 
