@@ -10,7 +10,7 @@ interface AnalysisControlsProps {
 
 export const AnalysisControls: React.FC<AnalysisControlsProps> = ({ mode, onModeChange, onAnalyzePage, isLoading }) => {
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-3">
       <div className="flex p-1 rounded-full bg-black/5 dark:bg-white/5" style={{ backgroundColor: 'var(--bg-secondary)' }}>
         <button
           onClick={() => onModeChange('page')}

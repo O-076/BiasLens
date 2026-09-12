@@ -37,13 +37,25 @@ export const TextInput: React.FC<TextInputProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-3 p-4">
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between text-xs px-1" style={{ color: 'var(--text-secondary)' }}>
+        <span className="font-medium">Input Text</span>
+        {value.length > 0 && (
+          <button 
+            onClick={() => onChange('')} 
+            className="text-xs hover:text-red-500 transition-colors"
+          >
+            Clear text
+          </button>
+        )}
+      </div>
+
       <div className="relative">
         <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Paste any text to analyze for bias..."
-          className="w-full h-40 p-3 text-sm rounded-xl border focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none transition-all"
+          placeholder="Paste an article, speech, opinion piece, or any statement here..."
+          className="w-full h-44 p-3 text-sm rounded-xl border focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none transition-all font-sans leading-relaxed"
           style={{ 
             backgroundColor: 'var(--bg-secondary)', 
             borderColor: isOverLimit ? 'rgb(239 68 68)' : 'var(--border)',
@@ -55,18 +67,23 @@ export const TextInput: React.FC<TextInputProps> = ({
         </div>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-        {examples.map((ex, idx) => (
-          <button
-            key={idx}
-            onClick={() => onChange(ex.text)}
-            className="flex items-center whitespace-nowrap px-2.5 py-1.5 text-xs rounded-lg border hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-            style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
-          >
-            {renderIcon(ex.icon)}
-            {ex.title}
-          </button>
-        ))}
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[11px] font-medium px-1 opacity-70" style={{ color: 'var(--text-secondary)' }}>
+          Or try a pre-loaded example:
+        </span>
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          {examples.map((ex, idx) => (
+            <button
+              key={idx}
+              onClick={() => onChange(ex.text)}
+              className="flex items-center whitespace-nowrap px-2.5 py-1.5 text-xs rounded-lg border hover:bg-black/5 dark:hover:bg-white/5 transition-colors font-medium shadow-sm"
+              style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+            >
+              {renderIcon(ex.icon)}
+              {ex.title}
+            </button>
+          ))}
+        </div>
       </div>
 
       <button

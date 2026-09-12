@@ -66,7 +66,16 @@ export default function App() {
   }, [darkMode]);
 
   const handleAnalyzePage = async () => {
-    if (!apiKey) {
+    let key = apiKey;
+    if (!key) {
+      const res = await browser.storage.local.get('biaslens_api_key');
+      if (res.biaslens_api_key) {
+        key = res.biaslens_api_key;
+        setApiKey(key);
+      }
+    }
+
+    if (!key) {
       setShowSettings(true);
       return;
     }
@@ -75,6 +84,7 @@ export default function App() {
       const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
       if (tab?.id) {
         setStatus('loading');
+        setError(null);
         browser.runtime.sendMessage({ type: 'ANALYZE_PAGE', tabId: tab.id });
       } else {
         setError('Could not find active tab');
@@ -86,8 +96,17 @@ export default function App() {
     }
   };
 
-  const handleAnalyzeText = () => {
-    if (!apiKey) {
+  const handleAnalyzeText = async () => {
+    let key = apiKey;
+    if (!key) {
+      const res = await browser.storage.local.get('biaslens_api_key');
+      if (res.biaslens_api_key) {
+        key = res.biaslens_api_key;
+        setApiKey(key);
+      }
+    }
+
+    if (!key) {
       setShowSettings(true);
       return;
     }
@@ -95,6 +114,7 @@ export default function App() {
     if (!inputText.trim()) return;
     
     setStatus('loading');
+    setError(null);
     browser.runtime.sendMessage({ type: 'ANALYZE_TEXT', text: inputText });
   };
 
